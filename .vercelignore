@@ -1,0 +1,6 @@
+# Never upload local env files: .env.local holds dev-proxy settings and operator credentials.
+.env*.local
+.env.local
+node_modules
+dist
+ADMIN_PANEL_INTEGRATION.md

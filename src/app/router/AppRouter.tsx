@@ -1,19 +1,32 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { AdminLayout } from '../layouts/AdminLayout'
 import { AuthLayout } from '../layouts/AuthLayout'
 import { navigateTo, routePaths, type RoutePath } from './routePaths'
 import { ProtectedRoute } from './ProtectedRoute'
 import { PermissionGate } from './PermissionGate'
 import type { PermissionKey } from '../../features/auth/types/auth.types'
-import { UserManagementPage } from '../../features/user-management/pages/UserManagementPage'
-import { ContentModerationPage } from '../../features/content-moderation/pages/ContentModerationPage'
-import { AnalyticsDashboardPage } from '../../features/analytics-dashboard/pages/AnalyticsDashboardPage'
-import { SubscriptionManagementPage } from '../../features/subscription-management/pages/SubscriptionManagementPage'
-import { DateSuggestionsPage } from '../../features/date-suggestions/pages/DateSuggestionsPage'
 import { LoginPage } from '../../features/auth/pages/LoginPage'
 import { ForgotPasswordPage } from '../../features/auth/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '../../features/auth/pages/ResetPasswordPage'
 import { useAuth } from '../../features/auth/hooks/useAuth'
+import { Skeleton } from '../../shared/components/Skeleton'
+
+// Each screen is its own chunk, so the login page does not download the whole panel.
+const UserManagementPage = lazy(() =>
+  import('../../features/user-management/pages/UserManagementPage').then((module) => ({ default: module.UserManagementPage })),
+)
+const ContentModerationPage = lazy(() =>
+  import('../../features/content-moderation/pages/ContentModerationPage').then((module) => ({ default: module.ContentModerationPage })),
+)
+const AnalyticsDashboardPage = lazy(() =>
+  import('../../features/analytics-dashboard/pages/AnalyticsDashboardPage').then((module) => ({ default: module.AnalyticsDashboardPage })),
+)
+const SubscriptionManagementPage = lazy(() =>
+  import('../../features/subscription-management/pages/SubscriptionManagementPage').then((module) => ({ default: module.SubscriptionManagementPage })),
+)
+const DateSuggestionsPage = lazy(() =>
+  import('../../features/date-suggestions/pages/DateSuggestionsPage').then((module) => ({ default: module.DateSuggestionsPage })),
+)
 
 const routeMeta = {
   [routePaths.userManagement]: {
@@ -131,6 +144,7 @@ export function AppRouter() {
         titleBadge={'titleBadge' in meta ? meta.titleBadge : undefined}
       >
         <PermissionGate permission={meta.permission}>
+          <Suspense fallback={<PageFallback />}>
           {adminPath === routePaths.analyticsDashboard ? (
             <AnalyticsDashboardPage searchQuery={searchQuery} />
           ) : adminPath === routePaths.contentModeration ? (
@@ -142,8 +156,17 @@ export function AppRouter() {
           ) : (
             <UserManagementPage searchQuery={searchQuery} />
           )}
+          </Suspense>
         </PermissionGate>
       </AdminLayout>
     </ProtectedRoute>
+  )
+}
+
+function PageFallback() {
+  return (
+    <div className="mx-auto w-full max-w-[1720px] px-3 py-3 sm:px-6 lg:px-7">
+      <Skeleton className="h-[calc(100vh-170px)] rounded-[28px]" />
+    </div>
   )
 }

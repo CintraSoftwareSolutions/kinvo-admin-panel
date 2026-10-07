@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Sidebar } from './components/Sidebar'
 import { MobileSidebar } from './components/MobileSidebar'
 import { Topbar } from './components/Topbar'
+import { ReadOnlyBanner } from './components/ReadOnlyBanner'
 import { SmoothScrollContainer } from '../../shared/components/SmoothScrollContainer'
 import type { RoutePath } from '../router/routePaths'
 
@@ -47,6 +48,7 @@ export function AdminLayout({
           searchPlaceholder={searchPlaceholder}
           titleBadge={titleBadge}
         />
+        <ReadOnlyBanner />
         <SmoothScrollContainer>{children}</SmoothScrollContainer>
       </div>
     </div>
