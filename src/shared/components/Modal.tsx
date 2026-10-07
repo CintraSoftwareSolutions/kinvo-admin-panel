@@ -43,7 +43,7 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
           onMouseDown={onClose}
         >
           <motion.div
-            className="w-full max-w-xl rounded-[28px] border border-slate-200 bg-white p-5 shadow-2xl"
+            className="max-h-[calc(100vh-32px)] w-full max-w-xl overflow-y-auto rounded-[28px] border border-slate-200 bg-white p-5 shadow-2xl"
             initial={{ opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.98 }}

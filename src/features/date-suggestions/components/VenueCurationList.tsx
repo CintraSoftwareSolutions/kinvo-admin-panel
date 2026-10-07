@@ -1,62 +1,56 @@
 import { useState } from 'react'
 import { EmptyState } from '../../../shared/components/EmptyState'
-import { appIcons } from '../../../shared/icons/appIcons'
+import { ErrorState } from '../../../shared/components/ErrorState'
+import { Skeleton } from '../../../shared/components/Skeleton'
+import type { CursorPagination } from '../../../shared/hooks/useCursorPages'
+import { DataTablePagination } from '../../../shared/table/DataTablePagination'
+import { getPaginationLabel } from '../../../shared/utils/pagination'
 import type { VenueSuggestion } from '../types/dateSuggestions.types'
 import { VenueCard } from './VenueCard'
-import { VenueStatusModal } from './VenueStatusModal'
+import { VenueEditModal } from './VenueEditModal'
 
 type VenueCurationListProps = {
   venues: VenueSuggestion[]
-  onUpdateStatus: (venueId: string, status: VenueSuggestion['status']) => void
+  loading: boolean
+  error: unknown
+  onRetry: () => void
+  pagination: CursorPagination
 }
 
-const PreviousIcon = appIcons.table.previous
-const NextIcon = appIcons.table.next
-
-export function VenueCurationList({ venues, onUpdateStatus }: VenueCurationListProps) {
+export function VenueCurationList({ venues, loading, error, onRetry, pagination }: VenueCurationListProps) {
   const [selectedVenue, setSelectedVenue] = useState<VenueSuggestion | null>(null)
-  const visibleVenues = venues.slice(0, 10)
+
+  if (loading) {
+    return (
+      <div className="grid gap-3 min-[900px]:grid-cols-2">
+        {Array.from({ length: 6 }, (_, index) => (
+          <Skeleton key={index} className="h-[134px] rounded-[22px]" />
+        ))}
+      </div>
+    )
+  }
+
+  if (error) {
+    return <ErrorState error={error} onRetry={onRetry} />
+  }
 
   return (
     <>
-      {visibleVenues.length === 0 ? (
-        <EmptyState />
+      {venues.length === 0 && !pagination.hasPrevious ? (
+        <EmptyState title="No venues match" description="Try a different search or clear the filters." />
       ) : (
         <>
           <div className="grid min-w-0 max-w-full gap-3 min-[900px]:grid-cols-2">
-            {visibleVenues.map((venue) => (
-              <VenueCard key={venue.id} venue={venue} onMoveStatus={setSelectedVenue} />
+            {venues.map((venue) => (
+              <VenueCard key={venue.id} venue={venue} onEdit={setSelectedVenue} />
             ))}
           </div>
-          <div className="mt-5 grid min-w-0 gap-3 border-t border-slate-300 px-0 py-3 text-sm text-slate-500 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:px-4">
-            <button
-              type="button"
-              disabled
-              className="inline-flex h-9 w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-4 font-semibold text-slate-400"
-            >
-              <PreviousIcon className="h-4 w-4" />
-              Previous
-            </button>
-            <div className="flex items-center justify-center gap-2">
-              <span>1-2 of 4 venues</span>
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600 font-semibold text-white">
-                1
-              </span>
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 font-semibold text-slate-500">
-                2
-              </span>
-            </div>
-            <button
-              type="button"
-              className="inline-flex h-9 w-fit items-center gap-2 justify-self-start rounded-full border border-slate-200 bg-white px-4 font-semibold text-slate-500 sm:justify-self-end"
-            >
-              Next
-              <NextIcon className="h-4 w-4" />
-            </button>
+          <div className="mt-5 overflow-hidden rounded-[24px] border border-slate-300">
+            <DataTablePagination label={getPaginationLabel(venues.length, 'venues')} pagination={pagination} />
           </div>
         </>
       )}
-      <VenueStatusModal venue={selectedVenue} onClose={() => setSelectedVenue(null)} onSave={onUpdateStatus} />
+      <VenueEditModal venue={selectedVenue} onClose={() => setSelectedVenue(null)} />
     </>
   )
 }

@@ -1,26 +1,44 @@
-import { useMemo, useState } from 'react'
-import { venuesMock } from '../data/venues.mock'
-import type { VenueStatus, VenueSuggestion } from '../types/dateSuggestions.types'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { apiSend } from '../../../api/client'
+import { useCursorPages } from '../../../shared/hooks/useCursorPages'
+import { useDebounce } from '../../../shared/hooks/useDebounce'
+import type { NewVenue, VenueCategory, VenuePatch, VenueSuggestion } from '../types/dateSuggestions.types'
 
-function matchesVenue(venue: VenueSuggestion, query: string) {
-  const normalizedQuery = query.trim().toLowerCase()
-  if (!normalizedQuery) {
-    return true
-  }
+const venueKeys = { all: ['admin', 'venues'] as const }
 
-  return [venue.name, venue.category, venue.status].some((value) => value.toLowerCase().includes(normalizedQuery))
+export type VenueFilters = {
+  category: VenueCategory | ''
+  active: '' | 'true' | 'false'
+  reviewed: '' | 'true' | 'false'
 }
 
-export function useVenueSuggestions(query: string) {
-  const [venues, setVenues] = useState(venuesMock)
-  const filteredVenues = useMemo(() => venues.filter((venue) => matchesVenue(venue, query)), [venues, query])
+/** GET /admin/venues, searched and filtered server-side. */
+export function useVenueSuggestions(query: string, filters: VenueFilters) {
+  const search = useDebounce(query.trim(), 300)
+  return useCursorPages<VenueSuggestion>({
+    queryKey: venueKeys.all,
+    path: '/admin/venues',
+    params: {
+      search: search || undefined,
+      category: filters.category || undefined,
+      active: filters.active || undefined,
+      reviewed: filters.reviewed || undefined,
+    },
+  })
+}
 
-  function updateVenueStatus(venueId: string, status: VenueStatus) {
-    setVenues((currentVenues) => currentVenues.map((venue) => (venue.id === venueId ? { ...venue, status } : venue)))
-  }
+export function useUpdateVenue() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: VenuePatch }) => apiSend<unknown>('PATCH', `/admin/venues/${id}`, patch),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: venueKeys.all }),
+  })
+}
 
-  return {
-    venues: filteredVenues,
-    updateVenueStatus,
-  }
+export function useCreateVenue() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (venue: NewVenue) => apiSend<unknown>('POST', '/admin/venues', venue),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: venueKeys.all }),
+  })
 }
