@@ -2,12 +2,23 @@ import { ActionIconButton } from '../../../../shared/components/ActionIconButton
 import { IconButtonGroup } from '../../../../shared/components/IconButtonGroup'
 import { appIcons } from '../../../../shared/icons/appIcons'
 
-export function ReportActions() {
+type ReportActionsProps = {
+  onView: () => void
+  onResolve: () => void
+  resolveDisabled?: boolean
+  resolveTitle?: string
+}
+
+export function ReportActions({ onView, onResolve, resolveDisabled, resolveTitle }: ReportActionsProps) {
   return (
     <IconButtonGroup>
-      <ActionIconButton icon={appIcons.contentModeration.actions.view} label="View report" />
-      <ActionIconButton icon={appIcons.contentModeration.actions.approve} label="Resolve report" />
-      <ActionIconButton icon={appIcons.contentModeration.actions.restrict} label="Restrict account" />
+      <ActionIconButton icon={appIcons.contentModeration.actions.view} label="View case" onClick={onView} />
+      <ActionIconButton
+        icon={appIcons.contentModeration.actions.approve}
+        label={resolveTitle ?? 'Resolve case'}
+        onClick={onResolve}
+        disabled={resolveDisabled}
+      />
     </IconButtonGroup>
   )
 }
