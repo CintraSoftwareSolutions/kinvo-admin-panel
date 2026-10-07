@@ -1,19 +1,33 @@
-import { useMemo } from 'react'
-import { usersMock } from '../data/users.mock'
-import type { User } from '../types/userManagement.types'
+import { useDebounce } from '../../../shared/hooks/useDebounce'
+import { useCursorPages } from '../../../shared/hooks/useCursorPages'
+import { userKeys } from '../api/userManagement.api'
+import type { AccountStatus, AuditEntry, Tier, User } from '../types/userManagement.types'
 
-function matchesUser(user: User, query: string) {
-  const normalizedQuery = query.trim().toLowerCase()
-  if (!normalizedQuery) {
-    return true
-  }
-
-  return [user.name, user.email, user.plan, user.mode, user.status, user.risk]
-    .join(' ')
-    .toLowerCase()
-    .includes(normalizedQuery)
+export type UserFilters = {
+  status: AccountStatus | ''
+  tier: Tier | ''
+  flagged: boolean
 }
 
-export function useUsers(query: string) {
-  return useMemo(() => usersMock.filter((user) => matchesUser(user, query)), [query])
+/** GET /admin/users, searched and filtered server-side on the honest fields. */
+export function useUsers(query: string, filters: UserFilters) {
+  const search = useDebounce(query.trim(), 300)
+  return useCursorPages<User>({
+    queryKey: userKeys.list,
+    path: '/admin/users',
+    params: {
+      search: search || undefined,
+      status: filters.status || undefined,
+      tier: filters.tier || undefined,
+      flagged: filters.flagged || undefined,
+    },
+  })
+}
+
+export function useAuditLog(enabled: boolean) {
+  return useCursorPages<AuditEntry>({
+    queryKey: userKeys.audit,
+    path: '/admin/audit-log',
+    enabled,
+  })
 }

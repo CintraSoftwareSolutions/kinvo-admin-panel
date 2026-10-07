@@ -1,7 +1,6 @@
 import { AnimatedNumber } from '../../../../shared/components/AnimatedNumber'
 import { appIcons } from '../../../../shared/icons/appIcons'
-import { userSnapshotMock } from '../../data/userSnapshot.mock'
-import type { SnapshotMetric } from '../../types/userManagement.types'
+import type { SnapshotData, SnapshotMetric } from '../../types/userManagement.types'
 
 const metricIcons = {
   purple: appIcons.userManagement.metrics.purple,
@@ -30,16 +29,16 @@ function MetricCard({ metric }: { metric: SnapshotMetric }) {
   )
 }
 
-export function UserWorkspaceSummary() {
+export function UserWorkspaceSummary({ snapshot }: { snapshot: SnapshotData }) {
   return (
     <div className="grid gap-3 xl:grid-cols-2">
-      {userSnapshotMock.metrics.map((metric) => (
+      {snapshot.metrics.map((metric) => (
         <MetricCard key={metric.label} metric={metric} />
       ))}
       <div className="rounded-[22px] border border-slate-300 bg-slate-50 p-4">
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-400">Top modes</p>
         <div className="grid gap-2 sm:grid-cols-2">
-          {userSnapshotMock.topModes.map((mode) => (
+          {snapshot.topModes.map((mode) => (
             <div key={mode.label} className="rounded-2xl border border-slate-300 bg-white p-3">
               <p className="font-semibold text-slate-950">{mode.label}</p>
               <p className="mt-1 text-xs text-slate-500">{mode.value}</p>
@@ -50,7 +49,7 @@ export function UserWorkspaceSummary() {
       <div className="rounded-[22px] border border-slate-300 bg-slate-50 p-4">
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-400">Payment health</p>
         <div className="grid gap-2">
-          {userSnapshotMock.paymentHealth.map((item) => (
+          {snapshot.paymentHealth.map((item) => (
             <div key={item.label} className="flex items-center justify-between rounded-2xl border border-slate-300 bg-white p-3">
               <span className="font-semibold text-slate-950">{item.label}</span>
               <AnimatedNumber value={item.value} className="font-semibold text-violet-700" />

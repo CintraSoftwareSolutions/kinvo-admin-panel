@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react'
 import { EmptyState } from '../components/EmptyState'
+import { ErrorState } from '../components/ErrorState'
+import type { CursorPagination } from '../hooks/useCursorPages'
 import { appIcons } from '../icons/appIcons'
 import { cn } from '../utils/cn'
 import { DataTablePagination } from './DataTablePagination'
+import { DataTableSkeleton } from './DataTableSkeleton'
 import type { DataTableColumn } from './table.types'
 
 type DataTableProps<TItem> = {
@@ -12,6 +15,12 @@ type DataTableProps<TItem> = {
   renderMobileCard: (item: TItem) => ReactNode
   paginationLabel: string
   selectable?: boolean
+  pagination?: CursorPagination
+  loading?: boolean
+  error?: unknown
+  onRetry?: () => void
+  emptyTitle?: string
+  emptyDescription?: string
 }
 
 const SortIcon = appIcons.table.sort
@@ -23,9 +32,23 @@ export function DataTable<TItem>({
   renderMobileCard,
   paginationLabel,
   selectable,
+  pagination,
+  loading,
+  error,
+  onRetry,
+  emptyTitle,
+  emptyDescription,
 }: DataTableProps<TItem>) {
-  if (items.length === 0) {
-    return <EmptyState />
+  if (loading) {
+    return <DataTableSkeleton />
+  }
+
+  if (error) {
+    return <ErrorState error={error} onRetry={onRetry} />
+  }
+
+  if (items.length === 0 && !pagination?.hasPrevious) {
+    return <EmptyState title={emptyTitle} description={emptyDescription} />
   }
 
   return (
@@ -75,7 +98,7 @@ export function DataTable<TItem>({
         </table>
       </div>
       <div className="grid max-w-full min-w-0 gap-3 p-3 lg:hidden">{items.map((item) => renderMobileCard(item))}</div>
-      <DataTablePagination label={paginationLabel} />
+      <DataTablePagination label={paginationLabel} pagination={pagination} />
     </div>
   )
 }

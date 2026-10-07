@@ -1,5 +1,7 @@
 import { SectionCard } from '../../../../shared/components/SectionCard'
 import { appIcons } from '../../../../shared/icons/appIcons'
+import { Skeleton } from '../../../../shared/components/Skeleton'
+import { useUserSnapshot } from '../../api/userManagement.api'
 import { HighValueMembers } from '../Snapshot/HighValueMembers'
 
 const guideCards = [
@@ -20,6 +22,8 @@ const guideCards = [
 const OperatorLoopIcon = appIcons.userManagement.operatorGuideCards.loop
 
 export function OperatorGuidePanel() {
+  const snapshot = useUserSnapshot()
+
   return (
     <SectionCard className="min-h-[calc(100vh-170px)]">
       <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-400">Guide</p>
@@ -46,7 +50,11 @@ export function OperatorGuidePanel() {
         </div>
         <div className="rounded-[22px] border border-slate-300 bg-slate-50 p-4">
           <p className="mb-5 font-semibold text-slate-950">Highest value members</p>
-          <HighValueMembers compact />
+          {snapshot.data ? (
+            <HighValueMembers members={snapshot.data.highValueMembers} compact />
+          ) : (
+            <Skeleton className="h-40" />
+          )}
         </div>
       </div>
     </SectionCard>

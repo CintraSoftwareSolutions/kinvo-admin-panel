@@ -18,7 +18,6 @@ import {
   Eye,
   EyeOff,
   FileClock,
-  FileDown,
   Flag,
   LockKeyhole,
   LogOut,
@@ -47,23 +46,29 @@ type IconTree = {
 
 const TrustShieldIcon = ShieldAlert
 
+// Keyed by the API's role and permission keys.
 const roleIconsById: Record<string, AppIcon> = {
-  'support-lead': UserRoundCog,
-  'revenue-ops': CreditCard,
-  'trust-specialist': TrustShieldIcon,
-  'super-admin': ShieldCheck,
+  administrator: ShieldCheck,
+  moderator: TrustShieldIcon,
+  analyst: BarChart3,
 }
 
 const permissionIconsById: Record<string, AppIcon> = {
-  'view-profiles': Eye,
-  'approve-verification': UserRoundCheck,
-  'export-data': FileDown,
-  'manage-credits': WalletCards,
-  'view-audit-trail': FileClock,
-  'moderate-reports': TrustShieldIcon,
-  'edit-pricing': CreditCard,
-  'assign-operators': UsersRound,
-  'launch-campaigns': CalendarDays,
+  'users.read': Eye,
+  'users.suspend': UserX,
+  'users.role': UserRoundCog,
+  'moderation.read': Flag,
+  'moderation.resolve': TrustShieldIcon,
+  'verification.read': UserRoundCheck,
+  'verification.review': UserRoundCheck,
+  'venues.read': MapPin,
+  'venues.write': MapPin,
+  'subscriptions.read': CreditCard,
+  'subscriptions.write': WalletCards,
+  'analytics.read': BarChart3,
+  'audit.read': FileClock,
+  'roles.read': UsersRound,
+  'roles.write': UsersRound,
 }
 
 export const appIcons = {

@@ -1,20 +1,21 @@
-import { appIcons, type AppIcon } from '../../../../shared/icons/appIcons'
+import { appIcons } from '../../../../shared/icons/appIcons'
 import { cn } from '../../../../shared/utils/cn'
 import type { Permission } from '../../types/userManagement.types'
 
 type PermissionRowProps = {
   permission: Permission
+  onToggle?: () => void
+  disabled?: boolean
+  disabledReason?: string
 }
 
-function getPermissionIcon(permissionId: string): AppIcon {
-  return appIcons.userManagement.permissionItems[permissionId] ?? appIcons.userManagement.permissions
-}
+const permissionIcons = appIcons.userManagement.permissionItems
+const FallbackPermissionIcon = appIcons.userManagement.permissions
+const AllowedIcon = appIcons.userManagement.permissionState.allowed
+const BlockedIcon = appIcons.userManagement.permissionState.blocked
 
-export function PermissionRow({ permission }: PermissionRowProps) {
-  const PermissionIcon = getPermissionIcon(permission.id)
-  const StateIcon = permission.allowed
-    ? appIcons.userManagement.permissionState.allowed
-    : appIcons.userManagement.permissionState.blocked
+export function PermissionRow({ permission, onToggle, disabled, disabledReason }: PermissionRowProps) {
+  const PermissionIcon = permissionIcons[permission.key] ?? FallbackPermissionIcon
 
   return (
     <div className="flex items-center justify-between gap-4 rounded-[18px] border border-slate-300 bg-white p-4">
@@ -25,16 +26,24 @@ export function PermissionRow({ permission }: PermissionRowProps) {
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-950">{permission.title}</p>
           <p className="mt-1 text-xs text-slate-500">{permission.description}</p>
+          <p className="mt-1 font-mono text-[11px] text-slate-400">{permission.key}</p>
         </div>
       </div>
-      <span
+      <button
+        type="button"
+        role="switch"
+        aria-checked={permission.allowed}
+        aria-label={`${permission.allowed ? 'Revoke' : 'Grant'} ${permission.title}`}
+        title={disabled ? disabledReason : permission.allowed ? 'Allowed — click to revoke' : 'Blocked — click to grant'}
+        disabled={disabled || !onToggle}
+        onClick={onToggle}
         className={cn(
-          'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+          'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition enabled:hover:ring-2 enabled:hover:ring-violet-200 disabled:cursor-not-allowed',
           permission.allowed ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-red-600',
         )}
       >
-        <StateIcon className="h-4 w-4" aria-hidden="true" />
-      </span>
+        {permission.allowed ? <AllowedIcon className="h-4 w-4" aria-hidden="true" /> : <BlockedIcon className="h-4 w-4" aria-hidden="true" />}
+      </button>
     </div>
   )
 }
