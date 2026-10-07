@@ -3,6 +3,8 @@ import { AdminLayout } from '../layouts/AdminLayout'
 import { AuthLayout } from '../layouts/AuthLayout'
 import { navigateTo, routePaths, type RoutePath } from './routePaths'
 import { ProtectedRoute } from './ProtectedRoute'
+import { PermissionGate } from './PermissionGate'
+import type { PermissionKey } from '../../features/auth/types/auth.types'
 import { UserManagementPage } from '../../features/user-management/pages/UserManagementPage'
 import { ContentModerationPage } from '../../features/content-moderation/pages/ContentModerationPage'
 import { AnalyticsDashboardPage } from '../../features/analytics-dashboard/pages/AnalyticsDashboardPage'
@@ -16,27 +18,32 @@ import { useAuth } from '../../features/auth/hooks/useAuth'
 const routeMeta = {
   [routePaths.userManagement]: {
     title: 'User management',
+    permission: 'users.read',
     searchPlaceholder: 'Search user management data',
   },
   [routePaths.contentModeration]: {
     title: 'Content moderation',
+    permission: 'moderation.read',
     searchPlaceholder: 'Search content moderation data',
   },
   [routePaths.analyticsDashboard]: {
     title: 'Analytics dashboard',
+    permission: 'analytics.read',
     searchPlaceholder: 'Search analytics dashboard data',
   },
   [routePaths.subscription]: {
     title: 'Admin operations',
+    permission: 'subscriptions.read',
     titleBadge: 'Required modules only',
     searchPlaceholder: 'Search plans or date suggestions',
   },
   [routePaths.dateSuggestions]: {
     title: 'Admin operations',
+    permission: 'venues.read',
     titleBadge: 'Required modules only',
     searchPlaceholder: 'Search plans or date suggestions',
   },
-} as const
+} as const satisfies Record<string, { title: string; permission: PermissionKey; searchPlaceholder: string; titleBadge?: string }>
 
 type AdminPath = keyof typeof routeMeta
 
@@ -123,17 +130,19 @@ export function AppRouter() {
         searchPlaceholder={meta.searchPlaceholder}
         titleBadge={'titleBadge' in meta ? meta.titleBadge : undefined}
       >
-        {adminPath === routePaths.analyticsDashboard ? (
-          <AnalyticsDashboardPage searchQuery={searchQuery} />
-        ) : adminPath === routePaths.contentModeration ? (
-          <ContentModerationPage searchQuery={searchQuery} />
-        ) : adminPath === routePaths.subscription ? (
-          <SubscriptionManagementPage searchQuery={searchQuery} />
-        ) : adminPath === routePaths.dateSuggestions ? (
-          <DateSuggestionsPage searchQuery={searchQuery} />
-        ) : (
-          <UserManagementPage searchQuery={searchQuery} />
-        )}
+        <PermissionGate permission={meta.permission}>
+          {adminPath === routePaths.analyticsDashboard ? (
+            <AnalyticsDashboardPage searchQuery={searchQuery} />
+          ) : adminPath === routePaths.contentModeration ? (
+            <ContentModerationPage searchQuery={searchQuery} />
+          ) : adminPath === routePaths.subscription ? (
+            <SubscriptionManagementPage searchQuery={searchQuery} />
+          ) : adminPath === routePaths.dateSuggestions ? (
+            <DateSuggestionsPage searchQuery={searchQuery} />
+          ) : (
+            <UserManagementPage searchQuery={searchQuery} />
+          )}
+        </PermissionGate>
       </AdminLayout>
     </ProtectedRoute>
   )
