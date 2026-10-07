@@ -60,13 +60,9 @@ function getKnownPath(pathname: string): RoutePath {
 }
 
 export function AppRouter() {
-  const { isAuthenticated } = useAuth()
+  const { status, isAuthenticated } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPath, setCurrentPath] = useState<RoutePath>(() => getKnownPath(window.location.pathname))
-
-  useEffect(() => {
-    setCurrentPath(getKnownPath(window.location.pathname))
-  }, [])
 
   useEffect(() => {
     function handlePopState() {
@@ -79,7 +75,7 @@ export function AppRouter() {
   }, [])
 
   useEffect(() => {
-    if (!isAuthenticated && isAdminPath(currentPath)) {
+    if (status === 'unauthenticated' && isAdminPath(currentPath)) {
       navigateTo(routePaths.login, { replace: true })
       return
     }
@@ -87,7 +83,7 @@ export function AppRouter() {
     if (isAuthenticated && currentPath === routePaths.login) {
       navigateTo(routePaths.userManagement, { replace: true })
     }
-  }, [currentPath, isAuthenticated])
+  }, [currentPath, isAuthenticated, status])
 
   function handleNavigate(path: RoutePath) {
     const nextPath = getKnownPath(path)

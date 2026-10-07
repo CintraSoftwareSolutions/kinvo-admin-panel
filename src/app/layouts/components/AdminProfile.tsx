@@ -1,16 +1,15 @@
 import { useRef, useState } from 'react'
 import { navigateTo, routePaths } from '../../router/routePaths'
-import { appConfig } from '../../../config/appConfig'
 import { useAuth } from '../../../features/auth/hooks/useAuth'
+import type { AdminMe } from '../../../features/auth/types/auth.types'
 import { appIcons } from '../../../shared/icons/appIcons'
 import { useClickOutside } from '../../../shared/hooks/useClickOutside'
 
 export function AdminProfile() {
-  const { currentUser, logout } = useAuth()
+  const { me, logout } = useAuth()
   const [open, setOpen] = useState(false)
-  const [failed, setFailed] = useState(false)
   const rootRef = useRef<HTMLDivElement | null>(null)
-  const profile = currentUser ?? appConfig.admin
+  const profile = getProfile(me)
   const LogoutIcon = appIcons.auth.logout
   const initials = profile.name
     .split(' ')
@@ -21,7 +20,7 @@ export function AdminProfile() {
   useClickOutside(rootRef, () => setOpen(false), open)
 
   function handleLogout() {
-    logout()
+    void logout()
     navigateTo(routePaths.login, { replace: true })
   }
 
@@ -33,18 +32,9 @@ export function AdminProfile() {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        {failed ? (
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-sm font-semibold text-violet-700">
-            {initials}
-          </span>
-        ) : (
-          <img
-            src={profile.avatar}
-            alt=""
-            className="h-9 w-9 rounded-full object-cover"
-            onError={() => setFailed(true)}
-          />
-        )}
+        <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-sm font-semibold text-violet-700">
+          {initials}
+        </span>
         <span className="text-left leading-tight">
           <span className="block text-sm font-semibold text-slate-950">{profile.name}</span>
           <span className="block text-xs text-slate-500">{profile.role}</span>
@@ -64,4 +54,12 @@ export function AdminProfile() {
       ) : null}
     </div>
   )
+}
+
+function getProfile(me: AdminMe | null) {
+  const name = me?.display_name || me?.email || 'Administrator'
+  const role = me?.is_super_admin
+    ? 'Super admin'
+    : (me?.roles[0]?.title ?? (me?.role === 'moderator' ? 'Moderator' : 'Admin'))
+  return { name, role }
 }

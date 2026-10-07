@@ -87,7 +87,7 @@ async function send(path: string, options: RequestOptions, accessToken: string |
     throw new ApiError(0, 'NETWORK_ERROR', 'Could not reach the Kinvo API. Check your connection and try again.', null)
   }
 
-  let envelope: Envelope | null = null
+  let envelope: Envelope | null
   try {
     envelope = (await response.json()) as Envelope
   } catch {

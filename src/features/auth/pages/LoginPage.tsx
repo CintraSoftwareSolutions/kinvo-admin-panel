@@ -16,13 +16,14 @@ type LoginErrors = {
 }
 
 export function LoginPage() {
-  const { login } = useAuth()
+  const { login, notice } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
   const [errors, setErrors] = useState<LoginErrors>({})
+  const [submitting, setSubmitting] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const nextErrors: LoginErrors = {
@@ -35,8 +36,11 @@ export function LoginPage() {
       return
     }
 
-    const result = login({ email, password, remember })
+    setSubmitting(true)
+    const result = await login({ email, password, remember })
+    setSubmitting(false)
     if (!result.ok) {
+      // error.message from the API is written to be shown as-is (incl. 429 RATE_LIMITED).
       setErrors({ form: result.error })
       return
     }
@@ -47,7 +51,7 @@ export function LoginPage() {
   return (
     <AuthCard>
       <AuthHeader title="Welcome back" subtitle="Sign in to manage Kinvo operations" />
-      <form className="grid gap-5" onSubmit={handleSubmit} noValidate>
+      <form className="grid gap-5" onSubmit={(event) => void handleSubmit(event)} noValidate>
         <div className="grid gap-2">
           <Input
             label="Email"
@@ -92,8 +96,8 @@ export function LoginPage() {
           </a>
         </div>
 
-        <FormError message={errors.form} />
-        <AuthPrimaryButton>Sign in</AuthPrimaryButton>
+        <FormError message={errors.form ?? notice ?? undefined} />
+        <AuthPrimaryButton disabled={submitting}>{submitting ? 'Signing in…' : 'Sign in'}</AuthPrimaryButton>
       </form>
     </AuthCard>
   )
