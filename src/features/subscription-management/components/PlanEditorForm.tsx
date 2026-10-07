@@ -52,13 +52,13 @@ export function PlanEditorForm({ plan }: PlanEditorFormProps) {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_120px]">
-          <Input label="Product name" value={name} onChange={(event) => setName(event.target.value)} className="h-12 rounded-[22px] font-semibold" />
+          <Input label="Product name" value={name} onChange={(event) => setName(event.target.value)} className="h-12 w-full min-w-0 rounded-[22px] font-semibold" />
           <Input
             label="Sort order"
             inputMode="numeric"
             value={sortOrder}
             onChange={(event) => setSortOrder(event.target.value)}
-            className="h-12 rounded-[22px] font-semibold"
+            className="h-12 w-full min-w-0 rounded-[22px] font-semibold"
           />
         </div>
         <Textarea

@@ -1,22 +1,15 @@
 import type { ReactNode } from 'react'
-import { useEffect } from 'react'
 import { useAuth } from '../../features/auth/hooks/useAuth'
 import { AuthCard, AuthPrimaryButton } from '../../features/auth/components/AuthCard'
 import { AuthLayout } from '../layouts/AuthLayout'
-import { navigateTo, routePaths } from './routePaths'
 
 type ProtectedRouteProps = {
   children: ReactNode
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  // The redirect to /login for unauthenticated visitors lives in AppRouter.
   const { status, notice, retry, logout } = useAuth()
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      navigateTo(routePaths.login, { replace: true })
-    }
-  }, [status])
 
   if (status === 'checking') {
     return (

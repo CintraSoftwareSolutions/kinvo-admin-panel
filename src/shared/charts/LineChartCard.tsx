@@ -53,9 +53,14 @@ export function LineChartCard({ data, series, maxValue, ticks }: LineChartCardPr
   return (
     <div className="mt-6 w-full min-w-0 max-w-full">
       <div className="grid min-w-0 grid-cols-[32px_minmax(0,1fr)] gap-2 sm:grid-cols-[40px_minmax(0,1fr)] sm:gap-3">
-        <div className="grid h-40 text-xs text-slate-500 sm:h-48" style={{ gridTemplateRows: `repeat(${ticks.length}, minmax(0, 1fr))` }}>
-          {ticks.map((tick) => (
-            <span key={tick} className="leading-none">
+        {/* Each label sits centred on its gridline: first at the top edge, last on the baseline. */}
+        <div className="relative h-40 text-xs text-slate-500 sm:h-48">
+          {ticks.map((tick, index) => (
+            <span
+              key={tick}
+              className="absolute left-0 -translate-y-1/2 leading-none"
+              style={{ top: `${(index / Math.max(ticks.length - 1, 1)) * 100}%` }}
+            >
               {tick}
             </span>
           ))}

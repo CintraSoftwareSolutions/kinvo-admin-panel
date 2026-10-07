@@ -23,7 +23,9 @@ export function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="font-semibold text-slate-950">
-            {plan.name} | {humanize(plan.billing_cycle)}
+            {plan.name}
+            {/* Product names usually already carry the cycle; only add it when they do not. */}
+            {plan.name.toLowerCase().includes(plan.billing_cycle.toLowerCase()) ? null : ` | ${humanize(plan.billing_cycle)}`}
           </p>
           <p className="mt-4 text-lg font-semibold text-slate-950">
             {plan.price ? formatMinor(plan.price.amount_minor, plan.price.currency) : 'No open price'}
