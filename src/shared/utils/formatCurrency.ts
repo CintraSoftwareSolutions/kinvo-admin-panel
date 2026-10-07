@@ -1,7 +1,7 @@
 // Money arrives as integer minor units plus an ISO currency code. Format for display only.
 export function formatMinor(amountMinor: number | null | undefined, currency: string | null | undefined) {
   if (amountMinor === null || amountMinor === undefined || !currency) return '—'
-  const formatter = new Intl.NumberFormat('en-GB', { style: 'currency', currency })
+  const formatter = new Intl.NumberFormat('en-GB', { style: 'currency', currency, currencyDisplay: 'narrowSymbol' })
   const digits = formatter.resolvedOptions().maximumFractionDigits ?? 2
   return formatter.format(amountMinor / 10 ** digits)
 }
