@@ -1,4 +1,5 @@
-import { AnimatedNumber, getAnimatedNumberParts } from '../../../../shared/components/AnimatedNumber'
+import { AnimatedNumber } from '../../../../shared/components/AnimatedNumber'
+import { getAnimatedNumberParts } from '../../../../shared/utils/animatedNumberParts'
 import { queueHealthMock } from '../../data/playbook.mock'
 
 export function QueueHealth() {

@@ -1,4 +1,5 @@
-import { AnimatedNumber, getAnimatedNumberParts } from '../../../../shared/components/AnimatedNumber'
+import { AnimatedNumber } from '../../../../shared/components/AnimatedNumber'
+import { getAnimatedNumberParts } from '../../../../shared/utils/animatedNumberParts'
 import { EmptyState } from '../../../../shared/components/EmptyState'
 import type { RevenueMetric } from '../../types/analyticsDashboard.types'
 

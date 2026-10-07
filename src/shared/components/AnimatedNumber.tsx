@@ -11,8 +11,6 @@ type AnimatedNumberProps = {
   useGrouping?: boolean
 }
 
-export type AnimatedNumberParts = Pick<AnimatedNumberProps, 'decimals' | 'prefix' | 'suffix' | 'value'>
-
 const prefersReducedMotionQuery = '(prefers-reduced-motion: reduce)'
 
 function getPrefersReducedMotion() {
@@ -29,33 +27,6 @@ function formatAnimatedValue(value: number, decimals: number, useGrouping: boole
     minimumFractionDigits: decimals,
     useGrouping,
   })
-}
-
-export function getAnimatedNumberParts(value: string | number): AnimatedNumberParts | null {
-  if (typeof value === 'number') {
-    return { value, decimals: 0 }
-  }
-
-  const match = value.trim().match(/^([^0-9.-]*)(-?\d[\d,]*(?:\.\d+)?)(.*)$/)
-  if (!match) {
-    return null
-  }
-
-  const [, prefix, numericValue, suffix] = match
-  const normalizedValue = Number(numericValue.replaceAll(',', ''))
-
-  if (!Number.isFinite(normalizedValue)) {
-    return null
-  }
-
-  const decimalValue = numericValue.split('.')[1]
-
-  return {
-    value: normalizedValue,
-    prefix,
-    suffix,
-    decimals: decimalValue ? decimalValue.length : 0,
-  }
 }
 
 export function AnimatedNumber({
