@@ -1,4 +1,5 @@
 import { BarChartCard } from '../../../../shared/charts/BarChartCard'
+import { chartScale } from '../../../../shared/utils/chartScale'
 import type { WeeklyResolutionPoint } from '../../types/analyticsDashboard.types'
 
 type WeeklyResolutionChartProps = {
@@ -6,6 +7,8 @@ type WeeklyResolutionChartProps = {
 }
 
 export function WeeklyResolutionChart({ data }: WeeklyResolutionChartProps) {
+  const { maxValue, ticks } = chartScale(data.flatMap((item) => [item.reported, item.resolved]))
+
   return (
     <BarChartCard
       data={data.map((item) => ({
@@ -19,8 +22,8 @@ export function WeeklyResolutionChart({ data }: WeeklyResolutionChartProps) {
         { key: 'reported', label: 'Reported', className: 'bg-orange-400' },
         { key: 'resolved', label: 'Resolved', className: 'bg-emerald-500' },
       ]}
-      maxValue={24}
-      ticks={[24, 18, 12, 6, 0]}
+      maxValue={maxValue}
+      ticks={ticks}
     />
   )
 }

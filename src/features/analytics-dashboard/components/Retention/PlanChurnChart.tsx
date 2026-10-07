@@ -1,4 +1,5 @@
 import { BarChartCard } from '../../../../shared/charts/BarChartCard'
+import { chartScale } from '../../../../shared/utils/chartScale'
 import type { ChurnPoint } from '../../types/analyticsDashboard.types'
 
 type PlanChurnChartProps = {
@@ -6,6 +7,8 @@ type PlanChurnChartProps = {
 }
 
 export function PlanChurnChart({ data }: PlanChurnChartProps) {
+  const { maxValue, ticks } = chartScale(data.flatMap((item) => [item.primary, item.secondary]))
+
   return (
     <BarChartCard
       data={data.map((item) => ({
@@ -16,11 +19,11 @@ export function PlanChurnChart({ data }: PlanChurnChartProps) {
         },
       }))}
       series={[
-        { key: 'primary', label: 'Primary churn', className: 'bg-rose-400' },
-        { key: 'secondary', label: 'Secondary churn', className: 'bg-blue-500' },
+        { key: 'primary', label: 'Monthly plans', className: 'bg-rose-400' },
+        { key: 'secondary', label: 'Yearly plans', className: 'bg-blue-500' },
       ]}
-      maxValue={12}
-      ticks={[12, 9, 6, 3, 0]}
+      maxValue={maxValue}
+      ticks={ticks}
     />
   )
 }
